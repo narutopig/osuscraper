@@ -33,7 +33,7 @@ if os.path.isdir(songsDir) == False:
 
 result = "" # folder where songs will be
 
-if len(sys.argv) >= 3 and os.path.isdir(sys.argv[2]):
+if len(sys.argv) >= 3:
     result = sys.argv[2]
     print("Result folder found")
 else:
