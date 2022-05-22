@@ -43,8 +43,8 @@ else:
         print("New result folder already exists, exiting")
         sys.exit(1)
     result = temp
-
-os.mkdir(result)
+if os.path.isdir(result) == False:
+    os.mkdir(result)
 
 for file in os.listdir(songsDir):
     song = os.path.join(songsDir, file)
