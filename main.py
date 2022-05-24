@@ -1,8 +1,5 @@
 import os, sys, time, shutil, configparser
 
-config = configparser.ConfigParser()
-config.read("config.ini")
-
 def anyStarts(string, strings): # checks if string starts with any value in strings
     for s in strings:
         if string.startswith(s):
@@ -28,24 +25,43 @@ def alreadyThere(datas, data):
 
     return False
 
-songsDir = os.path.join(sys.argv[1], "Songs")
+def requestYn(msg):
+    res = input(msg).lower()
+    
+    while True:
+        if res == "y":
+            return True
+        elif res == "n":
+            return False
+        else:
+            print("Invalid option")
+        res = input(msg).lower() 
+     
+config = configparser.ConfigParser()
+config.read("config.ini")
+
+songsDir = ""
+if "OPTIONS" in config and "osu" in config["OPTIONS"] and os.path.exists(config["OPTIONS"]["osu"]):
+    usecfg = requestYn("Valid osu! installation found, would you like to use this one? (Y/n) ")
+    if usecfg:
+        sys.argv = sys.argv[1:]
+        songsDir = config["OPTIONS"]["osu"]
+
+if songsDir == "":
+    try:
+        songsDir = os.path.join(sys.argv[1], "Songs")
+    except IndexError:
+        print("Invalid number of arguments")
+        sys.exit(1)
 
 if os.path.isdir(songsDir) == False:
     print("Songs folder not found")
     sys.exit(1)
 else:
-    save = False
-    t = input("Found osu! Songs folder, would you like to save this for later use? (Y/n) ").lower()
-    while True:
-        if t == "y":
-            save = True
-            break
-        elif t == "n":
-            save = False
-            break
-        else:
-            print("Invalid option")
-        t = input("Found osu! Songs folder, would you like to save this for later use? (Y/n) ").lower()
+    print("Songs folder found")
+
+if "OPTIONS" not in config or "osu" not in config["OPTIONS"]:
+    save = requestYn("Found osu! Songs folder, would you like to save this for later use? (Y/n) ")
     if save:
         config["OPTIONS"] = {"osu": sys.argv[1]}
         with open("config.ini", "w") as cfgFile:
@@ -53,29 +69,20 @@ else:
 
 result = "" # folder where songs will be
 
-if len(sys.argv) >= 3:
-    result = sys.argv[2]
-    print("Result folder found")
-else:
-    temp = os.path.join(os.getcwd(), "Songs " + str(time.time()))
-    print("Result folder not found, creating new one")
-    if os.path.isdir(temp):
-        print("New result folder already exists, exiting")
-        sys.exit(1)
-    result = temp
+if "OPTIONS" in config and "result" in config["OPTIONS"] and os.path.exists(config["OPTIONS"]["result"]):
+    usecfg = requestYn("Valid result foulder found, would you like to use this one? (Y/n) ")
+    if usecfg:
+        result = config["OPTIONS"]["result"]
+
+if result == "":
+    result = sys.argv[len(sys.argv) - 1] # last element
+print("Result folder found")
 
 save = False
-t = input("Found result folder, would you like to save this for later use? (Y/n) ").lower()
-while True:
-    if t == "y":
-        save = True
-        break
-    elif t == "n":
-        save = False
-        break
-    else:
-        print("Invalid option")
-    t = input("Found result folder, would you like to save this for later use? (Y/n) ").lower()
+
+if "OPTIONS" not in config or "result" not in config["OPTIONS"]:
+    save = requestYn("Found result folder, would you like to save this for later use? (Y/n) ")
+
 if save:
     config["OPTIONS"]["result"] = result
     with open("config.ini", "w") as cfgFile:
