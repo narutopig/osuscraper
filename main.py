@@ -1,4 +1,7 @@
-import os, sys, time, shutil
+import os, sys, time, shutil, configparser
+
+config = configparser.ConfigParser()
+config.read("config.ini")
 
 def anyStarts(string, strings): # checks if string starts with any value in strings
     for s in strings:
@@ -30,6 +33,23 @@ songsDir = os.path.join(sys.argv[1], "Songs")
 if os.path.isdir(songsDir) == False:
     print("Songs folder not found")
     sys.exit(1)
+else:
+    save = False
+    t = input("Found osu! Songs folder, would you like to save this for later use? (Y/n) ").lower()
+    while True:
+        if t == "y":
+            save = True
+            break
+        elif t == "n":
+            save = False
+            break
+        else:
+            print("Invalid option")
+        t = input("Found osu! Songs folder, would you like to save this for later use? (Y/n) ").lower()
+    if save:
+        config["OPTIONS"] = {"osu": sys.argv[1]}
+        with open("config.ini", "w") as cfgFile:
+            config.write(cfgFile)
 
 result = "" # folder where songs will be
 
@@ -43,6 +63,24 @@ else:
         print("New result folder already exists, exiting")
         sys.exit(1)
     result = temp
+
+save = False
+t = input("Found result folder, would you like to save this for later use? (Y/n) ").lower()
+while True:
+    if t == "y":
+        save = True
+        break
+    elif t == "n":
+        save = False
+        break
+    else:
+        print("Invalid option")
+    t = input("Found result folder, would you like to save this for later use? (Y/n) ").lower()
+if save:
+    config["OPTIONS"]["result"] = result
+    with open("config.ini", "w") as cfgFile:
+        config.write(cfgFile)
+
 if os.path.isdir(result) == False:
     os.mkdir(result)
 
