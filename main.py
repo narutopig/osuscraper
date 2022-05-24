@@ -45,7 +45,7 @@ if "OPTIONS" in config and "osu" in config["OPTIONS"] and os.path.exists(config[
     usecfg = requestYn("Valid osu! installation found, would you like to use this one? (Y/n) ")
     if usecfg:
         sys.argv = sys.argv[1:]
-        songsDir = config["OPTIONS"]["osu"]
+        songsDir = os.path.join(config["OPTIONS"]["osu"], "Songs")
 
 if songsDir == "":
     try:
